@@ -34,7 +34,7 @@ class HomeController @Inject()(implicit system: ActorSystem, mat: Materializer) 
   }
 
   def webSocketWithBridgedActor = WebSocket.accept[String, String] { r =>
-    ActorFlow.actorRef(out => StreamActor.props(out, mat))
+    ActorFlow.actorRef(out => StreamActorBridge.props(out, mat))
   }
 
 }
