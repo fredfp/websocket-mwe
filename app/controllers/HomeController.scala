@@ -4,7 +4,7 @@ import javax.inject._
 
 import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
 import akka.stream.Materializer
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{Flow, Sink, Source}
 import play.api.libs.streams.ActorFlow
 import play.api.mvc._
 
@@ -23,6 +23,10 @@ class HomeController @Inject()(implicit system: ActorSystem, mat: Materializer) 
     */
   def index = Action { r =>
     Ok(views.html.index("Your new application is ready.", r))
+  }
+
+  def justStreams =   WebSocket.accept[String, String] { r =>
+    Flow.fromSinkAndSource(Sink.ignore, Source.fromIterator(() => (1 to 1000).toIterator).map(i => i + ""))
   }
 
   def webSocketWithActor = WebSocket.accept[String, String] { r =>

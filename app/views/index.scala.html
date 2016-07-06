@@ -10,12 +10,38 @@
 *@
 @main("Welcome to Play") {
 
+    <button type="button" onclick="justWebsocketStream()">Request WebSocket Stream</button>
 
-    <button type="button" onclick="websocket()">Request WebSocket Stream</button>
+    <button type="button" onclick="websocket()">Request WebSocket Stream (Actor)</button>
 
-    <button type="button" onclick="websocketBridge()">Request WebSocket Stream Bridged</button>
+    <button type="button" onclick="websocketBridge()">Request WebSocket Stream Bridged (Actor)</button>
 
     <script type="application/javascript">
+
+            function justWebsocketStream() {
+
+                var url = '@routes.HomeController.justStreams().webSocketURL()(request)';
+
+                var connection = new WebSocket(url);
+
+                connection.onopen = function () {
+                    console.log("Connected!");
+                    connection.send("start")
+                };
+
+                connection.onerror = function (error) {
+                    console.log('WebSocket Error ' + error);
+                };
+
+                connection.onclose = function (error) {
+                    console.log('WebSocket Closed');
+
+                };
+
+                connection.onmessage = function (e) {
+                    console.log('Server: ' + e.data);
+                };
+            }
 
             function websocket() {
 
