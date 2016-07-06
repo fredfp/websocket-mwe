@@ -1,0 +1,73 @@
+@*
+* This template takes a single argument, a String containing a
+* message to display.
+*@
+@(message: String, request: RequestHeader)
+@*
+* Call the `main` template with two arguments. The first
+* argument is a `String` with the title of the page, the second
+* argument is an `Html` object containing the body of the page.
+*@
+@main("Welcome to Play") {
+
+
+    <button type="button" onclick="websocket()">Request WebSocket Stream</button>
+
+    <button type="button" onclick="websocketBridge()">Request WebSocket Stream Bridged</button>
+
+    <script type="application/javascript">
+
+            function websocket() {
+
+                var url = '@routes.HomeController.webSocketWithActor().webSocketURL()(request)';
+
+                var connection = new WebSocket(url);
+
+                connection.onopen = function () {
+                    console.log("Connected!");
+                    connection.send("start")
+                };
+
+                connection.onerror = function (error) {
+                    console.log('WebSocket Error ' + error);
+                };
+
+                connection.onclose = function (error) {
+                    console.log('WebSocket Closed');
+
+                };
+
+                connection.onmessage = function (e) {
+                    console.log('Server: ' + e.data);
+                };
+            }
+
+            function websocketBridge() {
+
+                var url = '@routes.HomeController.webSocketWithBridgedActor().webSocketURL()(request)';
+
+                var connection = new WebSocket(url);
+
+                connection.onopen = function () {
+                    console.log("Connected!");
+                    connection.send("start")
+                };
+
+                connection.onerror = function (error) {
+                    console.log('WebSocket Error ' + error);
+                };
+
+                connection.onclose = function (error) {
+                    console.log('WebSocket Closed');
+
+                };
+
+                connection.onmessage = function (e) {
+                    console.log('Server: ' + e.data);
+                };
+            }
+
+    </script>
+
+
+}
