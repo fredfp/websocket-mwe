@@ -5,11 +5,8 @@
 # An example controller showing a sample home page
 GET        /                    controllers.HomeController.index
 
-GET        /ws                  controllers.HomeController.webSocketWithActor
-
-GET        /ws/bridged          controllers.HomeController.webSocketWithBridgedActor
-
-GET        /stream              controllers.HomeController.justStreams
+GET        /ws/bad              controllers.HomeController.webSocketWithActorBad
+GET        /ws/good             controllers.HomeController.webSocketWithActorGood
 
 
 

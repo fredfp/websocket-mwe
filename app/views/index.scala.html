@@ -10,23 +10,20 @@
 *@
 @main("Welcome to Play") {
 
-    <button type="button" onclick="justWebsocketStream()">Request WebSocket Stream</button>
+    <button type="button" onclick="badWebsocket()">Request bad WebSocket</button>
 
-    <button type="button" onclick="websocket()">Request WebSocket Stream (Actor)</button>
-
-    <button type="button" onclick="websocketBridge()">Request WebSocket Stream Bridged (Actor)</button>
+    <button type="button" onclick="goodWebsocket()">Request good WebSocket</button>
 
     <script type="application/javascript">
 
-            function justWebsocketStream() {
+            function badWebsocket() {
 
-                var url = '@routes.HomeController.justStreams().webSocketURL()(request)';
+                var url = '@routes.HomeController.webSocketWithActorBad().webSocketURL()(request)';
 
                 var connection = new WebSocket(url);
 
                 connection.onopen = function () {
                     console.log("Connected!");
-                    connection.send("start")
                 };
 
                 connection.onerror = function (error) {
@@ -43,40 +40,14 @@
                 };
             }
 
-            function websocket() {
+            function goodWebsocket() {
 
-                var url = '@routes.HomeController.webSocketWithActor().webSocketURL()(request)';
-
-                var connection = new WebSocket(url);
-
-                connection.onopen = function () {
-                    console.log("Connected!");
-                    connection.send("start")
-                };
-
-                connection.onerror = function (error) {
-                    console.log('WebSocket Error ' + error);
-                };
-
-                connection.onclose = function (error) {
-                    console.log('WebSocket Closed');
-
-                };
-
-                connection.onmessage = function (e) {
-                    console.log('Server: ' + e.data);
-                };
-            }
-
-            function websocketBridge() {
-
-                var url = '@routes.HomeController.webSocketWithBridgedActor().webSocketURL()(request)';
+                var url = '@routes.HomeController.webSocketWithActorGood().webSocketURL()(request)';
 
                 var connection = new WebSocket(url);
 
                 connection.onopen = function () {
                     console.log("Connected!");
-                    connection.send("start")
                 };
 
                 connection.onerror = function (error) {

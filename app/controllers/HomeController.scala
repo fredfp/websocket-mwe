@@ -2,9 +2,8 @@ package controllers
 
 import javax.inject._
 
-import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
+import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props, Status}
 import akka.stream.Materializer
-import akka.stream.scaladsl.{Flow, Sink, Source}
 import play.api.libs.streams.ActorFlow
 import play.api.mvc._
 
@@ -25,66 +24,35 @@ class HomeController @Inject()(implicit system: ActorSystem, mat: Materializer) 
     Ok(views.html.index("Your new application is ready.", r))
   }
 
-  def justStreams =   WebSocket.accept[String, String] { r =>
-    Flow.fromSinkAndSource(Sink.ignore, Source.fromIterator(() => (1 to 1000).toIterator).map(i => i + ""))
+  def webSocketWithActorBad = WebSocket.accept[String, String] { r =>
+    ActorFlow.actorRef(out => StreamActor.props(false, out, mat))
   }
 
-  def webSocketWithActor = WebSocket.accept[String, String] { r =>
-    ActorFlow.actorRef(out => StreamActor.props(out, mat))
+  def webSocketWithActorGood = WebSocket.accept[String, String] { r =>
+    ActorFlow.actorRef(out => StreamActor.props(true, out, mat))
   }
-
-  def webSocketWithBridgedActor = WebSocket.accept[String, String] { r =>
-    ActorFlow.actorRef(out => StreamActorBridge.props(out, mat))
-  }
-
 }
 
 object StreamActor {
-  def props(out: ActorRef, materializer: Materializer): Props = Props(StreamActor(out, materializer))
+  def props(good: Boolean, out: ActorRef, materializer: Materializer): Props = Props(StreamActor(good, out, materializer))
 }
 
-case class StreamActor(out: ActorRef, materializer: Materializer)
+case class StreamActor(good: Boolean, out: ActorRef, materializer: Materializer)
   extends Actor {
 
   implicit val mat = materializer
 
-  override def receive: Receive = {
-    case s: String => Source.fromIterator(() => (1 to 1000).toIterator)
-      .map(i => i + "")
-      .runWith(Sink.actorRef(out, onCompleteMessage = PoisonPill))
-  }
-
-  override def postStop() = {
-    // Sending a PoisonPill to "out" stops this actor, is this the desired behaviour?
-    println("Closing websocket handler")
-  }
-
-}
-
-object StreamActorBridge {
-  def props(out: ActorRef, materializer: Materializer): Props = Props(StreamActor(out, materializer))
-}
-
-case class StreamActorBridge(out: ActorRef, materializer: Materializer)
-  extends Actor {
-
-  implicit val mat = materializer
+  case object DoIt
+  self ! DoIt
 
   override def receive: Receive = {
-    case s: String =>
-      context.become(bridge)
-      Source.fromIterator(() => (1 to 1000).toIterator)
-      .map(i => i + "")
-      .runWith(Sink.actorRef(self, onCompleteMessage = PoisonPill))
+    case DoIt =>
+      out ! "1"
+      out ! "2"
+      out ! "3"
+      if (good)
+        out ! Status.Success(())
+      else
+        self ! PoisonPill
   }
-
-  def bridge: Receive = {
-    case s: String => out ! s
-  }
-
-  override def postStop() = {
-    // Sending a PoisonPill to "out" stops this actor, is this the desired behaviour?
-    println("Closing websocket handler")
-  }
-
 }
