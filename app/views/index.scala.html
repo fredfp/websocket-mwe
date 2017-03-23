@@ -14,6 +14,12 @@
 
     <button type="button" onclick="goodWebsocket()">Request good WebSocket</button>
 
+    <br/>
+
+    <button type="button" onclick="fixedBadWebsocket()">Request fixed bad WebSocket</button>
+
+    <button type="button" onclick="fixedGoodWebsocket()">Request fixed good WebSocket</button>
+
     <script type="application/javascript">
 
             function badWebsocket() {
@@ -43,6 +49,54 @@
             function goodWebsocket() {
 
                 var url = '@routes.HomeController.webSocketWithActorGood().webSocketURL()(request)';
+
+                var connection = new WebSocket(url);
+
+                connection.onopen = function () {
+                    console.log("Connected!");
+                };
+
+                connection.onerror = function (error) {
+                    console.log('WebSocket Error ' + error);
+                };
+
+                connection.onclose = function (error) {
+                    console.log('WebSocket Closed');
+
+                };
+
+                connection.onmessage = function (e) {
+                    console.log('Server: ' + e.data);
+                };
+            }
+
+            function fixedBadWebsocket() {
+
+                var url = '@routes.HomeController.fixedWebSocketWithActorBad().webSocketURL()(request)';
+
+                var connection = new WebSocket(url);
+
+                connection.onopen = function () {
+                    console.log("Connected!");
+                };
+
+                connection.onerror = function (error) {
+                    console.log('WebSocket Error ' + error);
+                };
+
+                connection.onclose = function (error) {
+                    console.log('WebSocket Closed');
+
+                };
+
+                connection.onmessage = function (e) {
+                    console.log('Server: ' + e.data);
+                };
+            }
+
+            function fixedGoodWebsocket() {
+
+                var url = '@routes.HomeController.fixedWebSocketWithActorGood().webSocketURL()(request)';
 
                 var connection = new WebSocket(url);
 

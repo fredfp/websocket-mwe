@@ -8,6 +8,8 @@ GET        /                    controllers.HomeController.index
 GET        /ws/bad              controllers.HomeController.webSocketWithActorBad
 GET        /ws/good             controllers.HomeController.webSocketWithActorGood
 
+GET        /ws/fixed/bad        controllers.HomeController.fixedWebSocketWithActorBad
+GET        /ws/fixed/good       controllers.HomeController.fixedWebSocketWithActorGood
 
 
 # Map static resources from the /public folder to the /assets URL path
